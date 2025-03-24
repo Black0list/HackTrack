@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('themes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('description');
             $table->foreignId('hackathon_id')->nullable()->constrained('hackathons')->nullOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });

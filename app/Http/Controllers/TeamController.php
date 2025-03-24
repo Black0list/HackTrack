@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Hackathon;
 use Illuminate\Support\Facades\Validator;
+use Lcobucci\JWT\Exception;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
@@ -32,7 +33,7 @@ class TeamController extends Controller
             $team = new Team();
             $team->name = $request->name;
             $team->github_link = $request->github_link;
-            $team->hackathon_id = $hackathon->id;
+            $team->hackathon()->associate($hackathon);
             $team->status = 'rejected';
             $team->save();
 
@@ -57,5 +58,18 @@ class TeamController extends Controller
         $team->save();
 
         return response()->json(['message' => 'Team rejected successfully']);
+    }
+
+    public function joinTeam(Team $team)
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+
+        try {
+            $user->team()->associate($team);
+            $user->save();
+            return response()->json(['message' => $user->name . ' Successfully Joined Team ' . $team->name], 201);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 }

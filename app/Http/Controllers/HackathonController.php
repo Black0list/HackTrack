@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rule;
+use App\Models\Theme;
 use Illuminate\Http\Request;
 use App\Models\Hackathon;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class HackathonController extends Controller
 {
@@ -16,17 +17,9 @@ class HackathonController extends Controller
         return response()->json(Hackathon::all());
     }
 
-
     public function store(Request $request)
     {
         try {
-            $admin = JWTAuth::parseToken()->authenticate(); // or use auth()->user()
-
-            if (!$admin) {
-                return response()->json(['error' => 'Unauthorized'], 401);
-            }
-
-
             $validator = Validator::make($request->all(), [
                 'date' => 'required|date_format:Y-m-d',
                 'place' => 'required|string|max:255',
@@ -36,14 +29,27 @@ class HackathonController extends Controller
                 return response()->json(['errors' => $validator->errors()], 400);
             }
 
-
             $hackathon = new Hackathon();
             $hackathon->date = $request->date;
             $hackathon->place = $request->place;
-            $hackathon->admin = $admin->id;
-
 
             $hackathon->save();
+
+            $themes = $request['themes'];
+            foreach ($themes as $themed) {
+                $theme = new Theme();
+                $theme->name = $themed;
+                $theme->hackathon()->associate($hackathon);
+                $theme->save();
+            }
+
+            $rules = $request['rules'];
+            foreach ($rules as $ruled) {
+                $rule = new Rule();
+                $rule->name = $ruled;
+                $rule->hackathon()->associate($hackathon);
+                $rule->save();
+            }
 
             return response()->json($hackathon, 201);
 
@@ -51,8 +57,6 @@ class HackathonController extends Controller
             return response()->json(['error' => 'Invalid token'], 400);
         }
     }
-
-
 
     public function show(Hackathon $hackathon)
     {

@@ -29,4 +29,9 @@ class Hackathon extends Model
     {
         return $this->hasMany(Jury::class);
     }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin');
+    }
 }
