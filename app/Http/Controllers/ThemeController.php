@@ -32,32 +32,49 @@ class ThemeController extends Controller
         }
     }
 
-    public function show(Theme $theme)
+    public function show($id)
     {
-        return response()->json($theme);
+        $theme = Theme::findOrfail($id);
+
+        if(!$theme){
+            return response()->json(['error' => 'Theme not found'], 404);
+        }
+
+        return response()->json($theme, 200);
     }
 
-    public function update(Request $request, Theme $theme)
+    public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+        $theme = Theme::find($id);
+
+        if (!$theme) {
+            return response()->json(['error' => 'Theme not found'], 404);
         }
 
         try {
-            $theme->name = $validator['name'];
+            $theme->name = $request->input('name');
             $theme->save();
+
             return response()->json(['message' => 'Theme updated successfully'], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(['error' => 'An error occurred while updating the theme'], 500);
         }
     }
 
-    public function destroy(Theme $theme)
+
+
+    public function destroy($id)
     {
+        $theme = Theme::find($id);
+
+        if (!$theme) {
+            return response()->json(['error' => 'Theme not found'], 404);
+        }
+
         try {
             $theme->delete();
             return response()->json(['message' => 'Theme deleted successfully'], 200);

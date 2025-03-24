@@ -32,12 +32,18 @@ class RuleController extends Controller
         }
     }
 
-    public function show(Rule $rule)
+    public function show($id)
     {
+        $rule = Rule::findOrfail($id);
+
+        if(!$rule){
+            return response()->json(['error' => 'rule not found'], 404);
+        }
+
         return response()->json($rule);
     }
 
-    public function update(Request $request, Rule $rule)
+    public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -45,6 +51,12 @@ class RuleController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $rule = Rule::findOrfail($id);
+
+        if(!$rule){
+            return response()->json(['error' => 'rule not found'], 404);
         }
 
         try {
@@ -56,8 +68,14 @@ class RuleController extends Controller
         }
     }
 
-    public function destroy(Rule $rule)
+    public function destroy($id)
     {
+        $rule = Rule::findOrfail($id);
+
+        if(!$rule){
+            return response()->json(['error' => 'rule not found'], 404);
+        }
+
         try {
             $rule->delete();
             return response()->json(['message' => 'Rule deleted successfully'], 200);

@@ -23,6 +23,8 @@ class HackathonController extends Controller
             $validator = Validator::make($request->all(), [
                 'date' => 'required|date_format:Y-m-d',
                 'place' => 'required|string|max:255',
+                'themes' => 'required|array',
+                'rules' => 'required|array',
             ]);
 
             if ($validator->fails()) {

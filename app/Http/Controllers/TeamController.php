@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Theme;
 use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Hackathon;
@@ -12,9 +13,15 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class TeamController extends Controller
 {
-    public function registerTeam(Request $request, Hackathon $hackathon)
+    public function registerTeam(Request $request, $id)
     {
         try {
+            $hackathon = Hackathon::findOrfail($id);
+
+            if(!$hackathon){
+                return response()->json(['error' => 'Hackathon not found'], 404);
+            }
+
             $user = JWTAuth::parseToken()->authenticate();
 
             if (!$user) {
@@ -44,8 +51,15 @@ class TeamController extends Controller
         }
     }
 
-    public function approveTeam(Team $team)
+    public function approveTeam($id)
     {
+
+        $team = Team::findOrfail($id);
+
+        if(!$team){
+            return response()->json(['error' => 'Team not found'], 404);
+        }
+
         $team->status = 'approved';
         $team->save();
 
@@ -60,8 +74,15 @@ class TeamController extends Controller
         return response()->json(['message' => 'Team rejected successfully']);
     }
 
-    public function joinTeam(Team $team)
+    public function joinTeam($id)
     {
+
+        $team = Team::findOrfail($id);
+
+        if(!$team){
+            return response()->json(['error' => 'Team not found'], 404);
+        }
+
         $user = JWTAuth::parseToken()->authenticate();
 
         try {
