@@ -66,8 +66,15 @@ class HackathonController extends Controller
     }
 
 
-    public function update(Request $request, Hackathon $hackathon)
+    public function update(Request $request, $id)
     {
+
+        $hackathon = Hackathon::findOrfail($id);
+
+        if(!$hackathon){
+            return response()->json(['error' => 'Team not found'], 404);
+        }
+
         $validator = Validator::make($request->all(), [
             'date' => 'sometimes|date_format:Y-m-d',
             'place' => 'sometimes|string|max:255',

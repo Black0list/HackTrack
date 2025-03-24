@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rule;
 use App\Models\Theme;
 use Illuminate\Http\Request;
 use App\Models\Team;
@@ -90,6 +91,34 @@ class TeamController extends Controller
             $user->save();
             return response()->json(['message' => $user->name . ' Successfully Joined Team ' . $team->name], 201);
         } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+
+        $team = Team::findOrfail($id);
+
+        if(!$team){
+            return response()->json(['error' => 'Team not found'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'github_link' => 'required|url|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+
+        try {
+            $team->name = $validator['name'];
+            $team->save();
+            return response()->json(['message' => 'Team updated successfully'], 200);
+        } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }

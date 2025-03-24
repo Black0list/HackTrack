@@ -35,11 +35,12 @@ Route::middleware('jwt')->group(function () {
     Route::delete('/hackathon/{hackathon}/delete', [HackathonController::class, 'delete']);
 
 
-
+    Route::post('/teams/{team}/register', [TeamController::class, 'registerTeam']);
     Route::post('/teams/{team}/approve', [TeamController::class, 'approveTeam']);
     Route::post('/teams/{team}/reject', [TeamController::class, 'rejectTeam']);
-    Route::post('/team/{team}', [TeamController::class, 'joinTeam']);
-    Route::delete('/team/{team}', [TeamController::class, 'destroy']);
+    Route::post('/teams/{team}', [TeamController::class, 'joinTeam']);
+    Route::delete('/teams/{team}', [TeamController::class, 'destroy']);
+    Route::put('/teams/{team}', [TeamController::class, 'update']);
 
     Route::apiResource('themes', ThemeController::class);
     Route::apiResource('rules', RuleController::class);
