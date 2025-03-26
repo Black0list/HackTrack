@@ -25,7 +25,7 @@ class ThemeController extends Controller
 
         try {
             $theme = new Theme();
-            $theme->name = $validator['name'];
+            $theme->name = $request['name'];
             $theme->save();
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
@@ -34,7 +34,7 @@ class ThemeController extends Controller
 
     public function show($id)
     {
-        $theme = Theme::findOrfail($id);
+        $theme = Theme::find($id);
 
         if(!$theme){
             return response()->json(['error' => 'Theme not found'], 404);

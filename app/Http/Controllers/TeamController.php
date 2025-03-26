@@ -14,10 +14,21 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class TeamController extends Controller
 {
-    public function registerTeam(Request $request, $id)
+
+
+    public function index()
     {
+        return response()->json(Team::all());
+
+    }
+    public function registerTeam(Request $request, Team $team)
+    {
+        $this->authorize('register', $team);
+
+        $id = $team->id;
+
         try {
-            $hackathon = Hackathon::findOrfail($id);
+            $hackathon = Hackathon::find($id);
 
             if(!$hackathon){
                 return response()->json(['error' => 'Hackathon not found'], 404);
@@ -27,6 +38,11 @@ class TeamController extends Controller
 
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            if ($user->team)
+            {
+                return response()->json(['message' => 'You have already a Team'], 200);
             }
 
             $validator = Validator::make($request->all(), [
@@ -44,6 +60,8 @@ class TeamController extends Controller
             $team->hackathon()->associate($hackathon);
             $team->status = 'rejected';
             $team->save();
+            $user->team()->associate($team);
+            $user->save();
 
             return response()->json($team, 201);
 
@@ -54,8 +72,7 @@ class TeamController extends Controller
 
     public function approveTeam($id)
     {
-
-        $team = Team::findOrfail($id);
+        $team = Team::find($id);
 
         if(!$team){
             return response()->json(['error' => 'Team not found'], 404);
@@ -78,7 +95,7 @@ class TeamController extends Controller
     public function joinTeam($id)
     {
 
-        $team = Team::findOrfail($id);
+        $team = Team::find($id);
 
         if(!$team){
             return response()->json(['error' => 'Team not found'], 404);
@@ -98,7 +115,7 @@ class TeamController extends Controller
     public function update(Request $request, $id)
     {
 
-        $team = Team::findOrfail($id);
+        $team = Team::find($id);
 
         if(!$team){
             return response()->json(['error' => 'Team not found'], 404);
@@ -113,13 +130,35 @@ class TeamController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-
         try {
-            $team->name = $validator['name'];
+            $team->name = $request['name'];
             $team->save();
             return response()->json(['message' => 'Team updated successfully'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
+    }
+
+    public function show($id)
+    {
+        $team = Team::find($id);
+
+        if(!$team){
+            return response()->json(['error' => 'Team not found'], 404);
+        }
+
+        return response()->json(['team' => $team], 200);
+    }
+
+    public function destroy($id)
+    {
+        $team = Team::find($id);
+
+        if(!$team){
+            return response()->json(['error' => 'Team not found'], 404);
+        }
+
+        $team->delete();
+        return response()->json(['message' => 'Team deleted successfully'], 200);
     }
 }

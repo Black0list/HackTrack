@@ -20,6 +20,27 @@ class RoleController extends Controller
     }
 
     public function show($id){
-        return response()->json([Role::find($id)]);
+        $role = Role::find($id);
+
+        if(!$role){
+            return response()->json(['error'=>'Role not found.']);
+        }
+
+        return response()->json(['role' => $role]);
+    }
+
+    public function update(Request $request, $id){
+
+    }
+
+    public function destroy($id){
+        $role = Role::find($id);
+
+        if(!$role){
+            return response()->json(['error'=>'Role not found.']);
+        }
+
+        $role->delete();
+        return response()->json(['success'=>'Role deleted successfully.']);
     }
 }

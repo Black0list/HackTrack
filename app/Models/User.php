@@ -46,5 +46,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Team::class);
     }
 
+    public function isAdmin() : bool
+    {
+        return $this->role->role_name === 'admin';
+    }
+
+    public function isCompetitor() : bool
+    {
+        return $this->role->role_name === 'competitor';
+    }
 
 }

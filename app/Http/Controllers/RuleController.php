@@ -25,8 +25,10 @@ class RuleController extends Controller
 
         try {
             $rule = new Rule();
-            $rule->name = $validator['name'];
+            $rule->name = $request['name'];
             $rule->save();
+
+            return response()->json(['message' => 'Rule created'], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -34,7 +36,7 @@ class RuleController extends Controller
 
     public function show($id)
     {
-        $rule = Rule::findOrfail($id);
+        $rule = Rule::find($id);
 
         if(!$rule){
             return response()->json(['error' => 'rule not found'], 404);
@@ -53,14 +55,14 @@ class RuleController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $rule = Rule::findOrfail($id);
+        $rule = Rule::find($id);
 
         if(!$rule){
             return response()->json(['error' => 'rule not found'], 404);
         }
 
         try {
-            $rule->name = $validator['name'];
+            $rule->name = $request['name'];
             $rule->save();
             return response()->json(['message' => 'Rule updated successfully'], 200);
         } catch (\Exception $e) {
@@ -70,7 +72,7 @@ class RuleController extends Controller
 
     public function destroy($id)
     {
-        $rule = Rule::findOrfail($id);
+        $rule = Rule::find($id);
 
         if(!$rule){
             return response()->json(['error' => 'rule not found'], 404);

@@ -17,7 +17,7 @@ class Hackathon extends Model
 
     public function rules()
     {
-        return $this->hasMany(Rule::class);
+        return $this->belongsToMany(Rule::class);
     }
 
     public function teams()

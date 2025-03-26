@@ -54,7 +54,7 @@ class UserController extends Controller
             // (optional) Attach the role to the token.
             $token = JWTAuth::claims(['user' => $user])->fromUser($user);
 
-            return response()->json(compact('token'));
+            return response()->json(['token' => $token, 'isCompetitor' => $user->isCompetitor()], 200);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not create token'], 500);
         }
@@ -80,5 +80,19 @@ class UserController extends Controller
         JWTAuth::invalidate(JWTAuth::getToken());
 
         return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    public function add_role(Request $request, $user_id, $role_id)
+    {
+        $user = User::find($user_id);
+        $role = Role::find($role_id);
+
+        if($user && $role){
+            $user->role()->associate($role);
+            $user->save();
+            return response()->json(['message' => 'Role added Successfully', 'user' => $user]);
+        }
+
+        return response()->json(['message' => 'User Or Role not found'], 404);
     }
 }

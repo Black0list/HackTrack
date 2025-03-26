@@ -10,8 +10,8 @@ class Rule extends Model
     use HasFactory;
     protected $fillable = ['name'];
 
-    public function hackathon()
+    public function hackathons()
     {
-        return $this->belongsTo(Hackathon::class);
+        return $this->belongsToMany(Hackathon::class);
     }
 }

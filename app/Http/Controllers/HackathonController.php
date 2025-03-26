@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Rule;
 use App\Models\Theme;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Models\Hackathon;
 use Illuminate\Support\Facades\Validator;
@@ -11,10 +12,9 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class HackathonController extends Controller
 {
-
     public function index()
     {
-        return response()->json(Hackathon::all());
+        return response()->json(Hackathon::with(['themes', 'rules'])->get());
     }
 
     public function store(Request $request)
@@ -45,34 +45,51 @@ class HackathonController extends Controller
                 $theme->save();
             }
 
-            $rules = $request['rules'];
-            foreach ($rules as $ruled) {
-                $rule = new Rule();
-                $rule->name = $ruled;
-                $rule->hackathon()->associate($hackathon);
-                $rule->save();
+            $rulesIds = $request['rules'];
+            $notFoundRules = [];
+            $attachedRules = [];
+
+            foreach ($rulesIds as $id) {
+                try {
+                    $rule = Rule::findOrFail($id);
+                    $hackathon->rules()->attach($rule);
+                    $attachedRules[] = $rule;
+                } catch (ModelNotFoundException $e) {
+                    $notFoundRules[] = $id;
+                    continue;
+                }
             }
 
-            return response()->json($hackathon, 201);
+            return response()->json([
+                'data' => $hackathon,
+                'attached_rules' => $attachedRules,
+                'not_found_rules' => $notFoundRules
+            ], empty($notFoundRules) ? 200 : 404);
+
 
         } catch (JWTException $e) {
             return response()->json(['error' => 'Invalid token'], 400);
         }
     }
 
-    public function show(Hackathon $hackathon)
+    public function show($id)
     {
+        $hackathon = Hackathon::findOrfail($id);
+
+        if(!$hackathon){
+            return response()->json(['error' => 'Hackathon not found'], 404);
+        }
+
         return response()->json($hackathon, 200);
     }
 
 
     public function update(Request $request, $id)
     {
-
         $hackathon = Hackathon::findOrfail($id);
 
         if(!$hackathon){
-            return response()->json(['error' => 'Team not found'], 404);
+            return response()->json(['error' => 'Hackathon not found'], 404);
         }
 
         $validator = Validator::make($request->all(), [
@@ -88,8 +105,14 @@ class HackathonController extends Controller
         return response()->json($hackathon, 200);
     }
 
-    public function delete(Hackathon $hackathon)
+    public function delete($id)
     {
+        $hackathon = Hackathon::find($id);
+
+        if(!$hackathon){
+            return response()->json(['error' => 'Hackathon not found'], 404);
+        }
+
         $hackathon->delete();
         return response()->json(['message' => 'Hackathon deleted successfully']);
     }

@@ -13,9 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('rules', function (Blueprint $table) {
+        Schema::create('hackathon_rule', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('hackathon_id')->nullable()->constrained('hackathons')->onDelete('cascade')->onUpdate('cascade');
+            $table->string('rule_id')->nullable()->constrained('rules')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('rules');
+        Schema::dropIfExists('table_hackathons_rules');
     }
 };
