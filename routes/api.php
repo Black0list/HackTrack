@@ -7,7 +7,6 @@ use App\Http\Controllers\RuleController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,8 +34,7 @@ Route::middleware('jwt')->group(function () {
     Route::put('/hackathon/{hackathon}/update', [HackathonController::class, 'update']);
     Route::delete('/hackathon/{hackathon}/delete', [HackathonController::class, 'delete']);
 
-
-    Route::post('/teams/{team}/register', [TeamController::class, 'registerTeam'])->middleware(['can:register,team','log']);
+    Route::post('/teams/{team}/register', [TeamController::class, 'registerTeam'])->middleware(['can:isCompetitor','log']);
     Route::post('/teams/{team}/approve', [TeamController::class, 'approveTeam']);
     Route::post('/teams/{team}/reject', [TeamController::class, 'rejectTeam']);
     Route::post('/teams/{team}', [TeamController::class, 'joinTeam']);
@@ -48,7 +46,7 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('themes', ThemeController::class);
     Route::apiResource('rules', RuleController::class);
 
-    Route::apiResource('juries', JuryController::class)->middleware(['can:create,jury','log']);
+    Route::apiResource('juries', JuryController::class)->middleware(['can:isAdmin','log']);
 });
 
 

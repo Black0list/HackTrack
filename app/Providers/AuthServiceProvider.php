@@ -8,6 +8,7 @@ use App\Models\Team;
 use App\Policies\JuryPolicy;
 use App\Policies\TeamPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -17,8 +18,6 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Team::class => TeamPolicy::class,
-        Jury::class => JuryPolicy::class,
     ];
 
     /**
@@ -30,6 +29,12 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        Gate::define('isCompetitor', function ($user) {
+            return $user->isCompetitor();
+        });
+
+        Gate::define('isAdmin', function ($user) {
+            return $user->isAdmin();
+        });
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Theme;
 use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Hackathon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Lcobucci\JWT\Exception;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -21,11 +22,9 @@ class TeamController extends Controller
         return response()->json(Team::all());
 
     }
-    public function registerTeam(Request $request, Team $team)
+    public function registerTeam(Request $request, $id)
     {
-        $this->authorize('register', $team);
-
-        $id = $team->id;
+        Gate::allows('isCompetitor');
 
         try {
             $hackathon = Hackathon::find($id);
@@ -42,7 +41,7 @@ class TeamController extends Controller
 
             if ($user->team)
             {
-                return response()->json(['message' => 'You have already a Team'], 200);
+                return response()->json(['message' => 'You have already a Team, you must leave first'], 200);
             }
 
             $validator = Validator::make($request->all(), [
@@ -86,6 +85,7 @@ class TeamController extends Controller
 
     public function rejectTeam(Team $team)
     {
+
         $team->status = 'rejected';
         $team->save();
 
