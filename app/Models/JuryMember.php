@@ -9,7 +9,9 @@ class JuryMember extends Model
 {
     use HasFactory;
     protected $fillable = ['username', 'pin'];
+    protected $hidden = ['jury_id'];
 
+    protected $table = 'jurymembers';
     public function jury()
     {
         return $this->belongsTo(Jury::class);

@@ -49,10 +49,18 @@ Route::middleware('jwt')->group(function () {
 
     Route::apiResource('juries', JuryController::class)->middleware(['can:isAdmin','log']);
 
-    Route::apiResource('jury_members', JuryMemberController::class)->middleware(['can:isAdmin','log']);
+//    Route::apiResource('jury_members', JuryMemberController::class)->middleware(['can:isAdmin','log']);
+
+    Route::get('/jury_members', [JuryMemberController::class, 'index']);
+    Route::post('/jury_members/{jury}', [JuryMemberController::class, 'store'])->middleware(['can:isAdmin','log']);
+    Route::put('/jury_members/{jury}', [JuryMemberController::class, 'update']);
+    Route::get('/jury_members/{jury}', [JuryMemberController::class, 'show']);
+    Route::delete('/jury_members/{jury}', [JuryMemberController::class, 'destroy']);
 });
 
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
+
+Route::post('auth', [JuryMemberController::class, 'login']);
 
 
