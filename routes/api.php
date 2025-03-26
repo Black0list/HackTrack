@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HackathonController;
 use App\Http\Controllers\JuryController;
+use App\Http\Controllers\JuryMemberController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\TeamController;
@@ -47,17 +48,9 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('rules', RuleController::class);
 
     Route::apiResource('juries', JuryController::class)->middleware(['can:isAdmin','log']);
+
+    Route::apiResource('jury_members', JuryMemberController::class)->middleware(['can:isAdmin','log']);
 });
-
-
-
-
-
-
-
-
-
-
 
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);

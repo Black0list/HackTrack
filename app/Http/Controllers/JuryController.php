@@ -71,5 +71,6 @@ class JuryController extends Controller
         }
 
         $jury->delete();
+        return response()->json(['message' => 'Jury Deleted']);
     }
 }
