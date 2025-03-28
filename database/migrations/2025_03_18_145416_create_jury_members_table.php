@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('JuryMembers', function (Blueprint $table) {
             $table->id();
             $table->string('username');
-            $table->string('pin');
+            $table->string('password');
             $table->foreignId('jury_id')->nullable()->constrainted('juries')->onUpdate('cascade')->nullOnDelete();
             $table->timestamps();
         });

@@ -15,9 +15,9 @@ class Note extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function jury()
+    public function juryMember()
     {
-        return $this->belongsTo(Jury::class);
+        return $this->belongsTo(JuryMember::class);
     }
 
     public function hackathon()

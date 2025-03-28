@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'jury' => [
+            'driver' => 'jwt',
+            'provider' => 'jury_members',
+        ],
     ],
 
     /*
@@ -65,10 +69,10 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'jury_members' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\JuryMember::class,
+        ],
     ],
 
     /*
