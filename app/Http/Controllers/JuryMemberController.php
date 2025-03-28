@@ -117,7 +117,25 @@ class JuryMemberController extends Controller
 
     public function note(Request $request, $teamId)
     {
-        return JWTAuth::parseToken()->authenticate();
+        try {
+            $token = $request->bearerToken();
+
+            if (!$token) {
+                return response()->json(['error' => 'Token not provided'], 401);
+            }
+
+            $payload = JWTAuth::setToken($token)->getPayload();
+
+            $juryMemberId = $payload->get('juryMember')['id'];
+            $juryMember = JuryMember::find($juryMemberId);
+
+            if (!$juryMember) {
+                return response()->json(['message' => 'Jury member not found'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
         $team  = Team::find($teamId);
 
         if (!$team) {
@@ -134,11 +152,11 @@ class JuryMemberController extends Controller
 
         $note = new Note();
         $note->value = $request->get('note');
-        $note->juryMember()->associate($team);
-        $note->juryMember()->associate(auth()->user());
+        $note->team()->associate($team);
+        $note->juryMember()->associate($juryMember);
 
         $note->save();
 
-        return response()->json(['note' => $note, 'juryMember' => auth()->user()->username]);
+        return response()->json(['note' => $note]);
     }
 }
