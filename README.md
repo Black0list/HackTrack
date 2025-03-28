@@ -1,66 +1,165 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📘 Documentation API - Hackathon Management
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 🚀 Introduction
+Cette API permet de gérer les éditions annuelles d'un hackathon, les équipes, les projets soumis et les évaluations des jurys. Conçue avec **Laravel** et **PostgreSQL**, elle utilise **JWT** pour l'authentification et fournit une interface **RESTful**.
 
-## About Laravel
+## 🛠️ Prérequis
+- PHP >= 8.0
+- Laravel 9
+- PostgreSQL
+- Composer
+- Node.js & npm
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🧑‍💻 Installation
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. **Cloner le projet**
+```bash
+git clone https://github.com/Black0list/HackTrack.git
+cd HackTrack
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2. **Installer les dépendances**
+```bash
+composer install
+npm install && npm run dev
+```
 
-## Learning Laravel
+### 3. **Configurer l'environnement**
+```bash
+cp .env.example .env
+```
+📄 **Modifier le fichier `.env`** avec les informations de votre base de données PostgreSQL :
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=hackathon_db
+DB_USERNAME=postgres
+DB_PASSWORD=password
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 4. **Générer la clé de l'application**
+```bash
+php artisan key:generate
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 5. **Exécuter les migrations**
+```bash
+php artisan migrate 
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 6. **Lancer le serveur**
+```bash
+php artisan serve
+```
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## 🌐 Endpoints API
 
-### Premium Partners
+### 🔐 **1. Authentification & Gestion des Rôles**
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+- **POST** `/api/register` : Inscription utilisateur
+- **POST** `/api/login` : Connexion utilisateur
+- **POST** `/api/logout` : Déconnexion utilisateur *(JWT requis)*
+- **GET** `/api/user` : Détails de l'utilisateur authentifié *(JWT requis)*
+- **POST** `/api/user/{user}/role/{role}` : Attribuer un rôle à un utilisateur *(Admin uniquement)*
 
-## Contributing
+📦 **Exemple de réponse :**
+```json
+{
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "johndoe@example.com",
+    "role": {
+        "id" : 2,
+        "role_name" : "participant"
+    },
+  },
+  "token": "eyJhbGciOiJIUzI1..."
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+### 🗓 **2. Gestion des Éditions**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- **GET** `/api/hackathons` : Liste des éditions
+- **POST** `/api/hackathon/create` : Créer une édition *(Admin uniquement)*
+- **PUT** `/api/hackathon/{hackathon}/update` : Modifier une édition *(Admin uniquement)*
+- **DELETE** `/api/hackathon/{hackathon}/delete` : Supprimer une édition *(Admin uniquement)*
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 👥 **3. Gestion des Équipes**
 
-## License
+- **POST** `/api/teams/{team}/register` : Inscription d'une équipe *(Compétiteur)*
+- **POST** `/api/teams/{team}/approve` : Valider une équipe *(Admin)*
+- **POST** `/api/teams/{team}/reject` : Rejeter une équipe *(Admin)*
+- **POST** `/api/teams/{team}` : Rejoindre une équipe
+- **GET** `/api/teams/{team}` : Voir les détails d'une équipe
+- **GET** `/api/teams` : Liste des équipes
+- **PUT** `/api/teams/{team}` : Modifier les informations d'une équipe
+- **DELETE** `/api/teams/{team}` : Supprimer une équipe
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+### 🏁 **4. Gestion des Thèmes et Règles**
+
+- **GET** `/api/themes` : Liste des thèmes
+- **POST** `/api/themes` : Créer un thème
+- **PUT** `/api/themes/{theme}` : Mettre à jour un thème
+- **DELETE** `/api/themes/{theme}` : Supprimer un thème
+- **GET** `/api/rules` : Liste des règles
+- **POST** `/api/rules` : Créer une règle
+- **PUT** `/api/rules/{rule}` : Modifier une règle
+- **DELETE** `/api/rules/{rule}` : Supprimer une règle
+
+---
+
+### 🧑‍⚖️ **5. Gestion des Jurys**
+
+- **GET** `/api/juries` : Liste des jurys *(Admin uniquement)*
+- **POST** `/api/juries` : Ajouter un jury *(Admin uniquement)*
+- **PUT** `/api/juries/{jury}` : Mettre à jour un jury *(Admin uniquement)*
+- **DELETE** `/api/juries/{jury}` : Supprimer un jury *(Admin uniquement)*
+
+---
+
+### 🏆 **6. Évaluation des Projets**
+
+- **POST** `/api/note/{team}` : Noter un projet *(Jury uniquement)*
+
+---
+
+## ⚠️ Gestion des Erreurs
+
+L'API utilise des **codes HTTP standards** pour indiquer les erreurs.
+
+- `400` : Requête invalide
+- `401` : Non authentifié
+- `403` : Accès refusé
+- `404` : Ressource non trouvée
+- `500` : Erreur interne du serveur
+
+📦 **Exemple d'erreur :**
+```json
+{
+  "error": "Unauthorized access. Please log in."
+}
+```
+
+---
+
+## 🧪 Tests API
+
+Importez la collection **Postman** fournie pour tester les endpoints. Assurez-vous d'utiliser le **token JWT** pour les requêtes authentifiées.
+
+---
+
+## ✨ Auteur
+Ce projet a été développé par **HADOUI ABDELKEBIR**.
+- 📧 Contact : contact.abdelkebir@gmail.com
+- 🔗 GitHub : [Black0list](https://github.com/Black0list)
+
